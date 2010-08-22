@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Greenblog news{% endblock %}
+
+{% block content %}
+	{% for post in blogposts %}
+		{% if user %}
+			<div class="admin_options"><a href="/edit/post/{{ post.key.id }}/" id="p_{{ post.key.id }}"><img title="edit post..."  alt="edit post.." src="../static/images/edit-32.png"/></a><a href="/delete/post/{{ post.key.id }}/" class="delete_post_link" id="p_{{ post.key.id }}"><img title="delete post..." src="../static/images/cross.png"/></a></div>
+		{% endif %}
+      <h2>{{ post.title|escape }}</h2>      
+      <div class="post_content">{{ post.content }}</div>
+      <span class="date_field">Added {{ post.created|date:"d.m.Y" }}</span>
+	{% endfor %}
+	
+	<div id="pagination_links">
+	
+		{% if prevPageNumber %}
+			<a href="/?page={{ prevPageNumber }}"><< newer posts</a>
+		{% endif %}
+	
+		{% if nextPageNumber %}
+			<a href="/?page={{ nextPageNumber }}">older posts >></a>
+		{% endif %}
+	
+	</div>
+	
+{% endblock %}
+

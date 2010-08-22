@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Greenblog news{% endblock %}
+
+{% block content %}
+
+<form action="/new/post/" method="post">
+
+Title <br />
+<input type="text" name="title"/><br />
+Content <br />
+<textarea class="tinymce post" id="elm1" rows="15" cols="60" name="content">
+</textarea>
+
+</form>
+
+{% endblock %}

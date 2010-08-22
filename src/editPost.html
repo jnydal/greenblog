@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Greenblog - edit post{% endblock %}
+
+{% block content %}
+
+<form action="/edit/post/{{ post.key.id }}/" method="post">
+
+Title <br />
+<input type="text" name="title" value="{{ post.title }}"/><br />
+Content <br />
+<textarea class="tinymce post" id="elm1" rows="15" cols="60" name="content">
+{{ post.content }}
+</textarea>
+
+</form>
+
+{% endblock %}
