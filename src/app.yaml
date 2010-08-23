@@ -1,4 +1,4 @@
-application: greenblog
+application: nifrost-band
 version: 1
 runtime: python
 api_version: 1
@@ -13,5 +13,5 @@ handlers:
   static_dir: static
 
 - url: .*
-  script: greenblog.py
+  script: nifrost.py
   

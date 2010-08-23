@@ -25,6 +25,7 @@ from appengine_utilities import sessions
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from django.core.paginator import ObjectPaginator
+from django.utils import simplejson
 
 from utils import authenticatedUser
 from utils import menuLinks
@@ -37,11 +38,12 @@ from page import PageViewHandler
 from page import PageDeleteHandler
 from page import PageEditHandler
 from page import PageNewHandler
+from page import PageJsonHandler
 
 from google.appengine.ext.db.djangoforms import DateTimeProperty
 
 
-class News(webapp.RequestHandler):
+class NewsViewHandler(webapp.RequestHandler):
     def get(self):
         
         page = int(self.request.get('page', '0')) 
@@ -69,6 +71,20 @@ class News(webapp.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), 'news.html')
         self.response.out.write(template.render(path, template_values))
+
+class NewsJsonHandler(webapp.RequestHandler):
+    def get(self,page):
+        
+        #rpc = db.create_rpc(deadline=10, read_policy=db.EVENTUAL_CONSISTENCY)
+        
+        paginator = ObjectPaginator(db.GqlQuery('SELECT * FROM BlogPostModel ORDER BY created DESC'),10)
+        
+        try:
+            blogposts = paginator.get_page(page)
+            self.response.out.write(simplejson.dumps([p.to_dict() for p in blogposts]))
+        
+        except:
+            self.error(404)
 
 class PostNewHandler(webapp.RequestHandler):
     def post(self):
@@ -190,7 +206,8 @@ class Logout(webapp.RequestHandler):
 
 def main():
     
-    application = webapp.WSGIApplication([('/', News),
+    application = webapp.WSGIApplication([('/', NewsViewHandler),
+                                          ('/rest/news/(\d*)/', NewsJsonHandler),
                                           ('/login/', Login),
                                           ('/logout/', Logout),
                                           ('/new/post/',PostNewHandler),
@@ -199,6 +216,7 @@ def main():
                                           ('/new/page/',PageNewHandler),
                                           ('/edit/page/(.*)/',PageEditHandler),
                                           ('/delete/page/(.*)/', PageDeleteHandler),
+                                          ('/rest/page/(.*)/', PageJsonHandler),
                                           ('/(.*)/', PageViewHandler),
                                           ('/(.*)', Error404),
                                           ],

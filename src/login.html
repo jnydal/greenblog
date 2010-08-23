@@ -10,16 +10,24 @@
 	
 	{% endif %}
 
-	<h1>Login</h1>
-
 	<form id="login_form" method="post">
+	
+		<h1>Login</h1>
 	
 			<b>Admin </b><br/><input type="text" name="user" /><br/>
 				
 			<b>Password </b><br/><input type="password" name="password" /><br/>
 		
-			<input onclick="GREENBLOG.insertHashedPassword('login_form',true);" value="Login" type="submit" class="button" />
+			<input value="Login" type="submit" class="button" />
 		
 	</form>
 
+{% endblock %}
+
+{% block viewscript %}
+	
+		$(document).ready(function() {
+			
+		});
+	
 {% endblock %}

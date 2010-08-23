@@ -14,6 +14,12 @@ due to googles resource saving policy for small trafficated pages - because we k
 And I must say - wow - python is really fun! and also much faster to develop in than java - a perfect choice for app engine.
 
 
+features v0.2
+*******************************
+
+- JSON-RPC page and post handling as a progressive enhancement
+- lazy loading news (on scroll)
+
 How to install:
 ***************
 

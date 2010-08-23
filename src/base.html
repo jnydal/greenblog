@@ -2,23 +2,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 
-<meta name="description" content="Greenblog, a folk/black metal inspired band from Norway." />
-<meta name="keywords" content="black, metal, folk, norwegian, music" />
+<meta name="description" content="Greenblog" />
+<meta name="keywords" content="" />
 <meta name="author" content="Jørund Nydal" />
 <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=UTF-8" />
 
 <title>{% block title %}My amazing site{% endblock %}</title>
 
 <link rel="stylesheet" type="text/css" href="/static/css/screen.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/static/css/superfish.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/static/css/superfish-navbar.css" />
-<link type="text/css" href="/static/css/custom-theme/jquery-ui-1.8.4.custom.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="/static/CLEditor1_2_2/jquery.cleditor.css" />
 
 </head>
 
 <body>
 
-<img alt="background image" src="/static/images/greenblog_back.png" class="bg" />
+<div id="ajaxLoader"><img src="/static/images/spinner.gif"/></div>
+
+<img alt="background image" src="/static/images/skin_blue/background.png" class="bg" />
 
 <div id="page_wrapper">
 
@@ -32,93 +32,19 @@
 {% endif %}
 
 <div id="top_logo"></div>
-
-<div id="top_menu_transparancy"></div>
 <div id="top_menu">
 	
 {% block topmenu %}
 
-<ul class="sf-menu sf-navbar">
+<ul id="nav">
 
-<!-- get page/handler and request attribute, make a clausule an put class="current" attribute to li element if handler is PageController by getting id parameter -->
-
-						<li><a href="/">News</a></li>
+		<li><a onclick="$('#main_content').html('<div id=\'newspage_content\'></div><div id=\'lastPostsLoader\'> </div>'); GREENBLOG.resetCurrentNewsPage(); GREENBLOG.ajaxLoadLastNewsPage(); return false;" href="/">News</a></li>
 					
-					   {% for menulink in menulinks %}
-							{{ query_string }}
-							<li><a href="/{{ menulink.key.name }}/">{{ menulink.title }}</a></li>
-  					   {% endfor %}
+		{% for menulink in menulinks %}
+			<li><a onclick="GREENBLOG.ajaxLoadPage('{{ menulink.key.name }}'); return false;" href="/{{ menulink.key.name }}/">{{ menulink.title }}</a></li>
+  		{% endfor %}				
 					
-					<!--<li>
-						<a class="sf-with-ul" href="#">Merch<span class="sf-sub-indicator"> &#187;</span></a>
-						<ul>
-							<li>
-
-								<a class="sf-with-ul" href="#">Tee's<span class="sf-sub-indicator"> &#187;</span></a>
-								<ul>
-									<li><a href="#">menu item</a></li>
-									<li><a href="#aba">menu item</a></li>
-									<li><a href="#abb">menu item</a></li>
-									<li><a href="#abc">menu item</a></li>
-
-									<li><a href="#abd">menu item</a></li>
-								</ul>
-							</li>
-							<li>
-								<a class="sf-with-ul" href="#">Long sleeves<span class="sf-sub-indicator"> &#187;</span></a>
-								<ul>
-									<li><a href="#">menu item</a></li>
-
-									<li><a href="#aba">menu item</a></li>
-									<li><a href="#abb">menu item</a></li>
-									<li><a href="#abc">menu item</a></li>
-									<li><a href="#abd">menu item</a></li>
-								</ul>
-							</li>
-							<li>
-
-								<a class="sf-with-ul" href="#">Caps<span class="sf-sub-indicator"> &#187;</span></a>
-								<ul>
-									<li><a href="#">menu item</a></li>
-									<li><a href="#aba">menu item</a></li>
-									<li><a href="#abb">menu item</a></li>
-									<li><a href="#abc">menu item</a></li>
-
-									<li><a href="#abd">menu item</a></li>
-								</ul>
-							</li>
-							<li><a href="#">Shopping cart</a></li>
-						</ul>
-					</li>
-					<li>
-						<a class="sf-with-ul" href="#">menu item<span class="sf-sub-indicator"> &#187;</span></a>
-
-						<ul>
-							<li><a href="#">if no subitems, duplicate parent item href and use this as descriptive label</a></li>
-						</ul>
-					</li>
-					<li>
-						<a class="sf-with-ul" href="#">menu item<span class="sf-sub-indicator"> &#187;</span></a>
-						<ul>
-
-							<li><a href="#">subitem 4a</a></li>
-							<li><a href="#">subitem 4b</a></li>
-							<li><a href="#">subitem 4c</a></li>
-							<li><a href="#">subitem 4d</a></li>
-						</ul>
-					</li>
-					<li>
-
-						<a class="sf-with-ul" href="#">menu item<span class="sf-sub-indicator"> &#187;</span></a>
-						<ul>
-							<li><a href="#">subitem 5a</a></li>
-							<li><a href="#">subitem 5b</a></li>
-							<li><a href="#">subitem 5c</a></li>
-							<li><a href="#">subitem 5d</a></li>
-
-						</ul>
-					</li> -->
-				</ul>
+</ul>
 
 {% endblock %}
 				
@@ -139,30 +65,23 @@
 
 </div>
 
-<div id="footer">greenblog-band</div>
+<div id="footer">nifrost-band</div>
 
 </div>
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js"></script> 
-<script type="text/javascript" src="/static/scripts/jquery-ui-1.8.4.custom.min.js"></script>
-<script type="text/javascript" src="/static/scripts/jshash-2.2/sha1-min.js"></script>
-<script type="text/javascript" src="/static/scripts/greenblog.js"></script>
-<script type="text/javascript" src="/static/scripts/jquery.hoverIntent.minified.js"></script>
-<script type="text/javascript" src="/static/scripts/superfish.js"></script>
-<script type="text/javascript" src="/static/tinymce/jscripts/tiny_mce/jquery.tinymce.js"></script>
+<script type="text/javascript" src="/static/scripts/nifrost.js"></script>
+<script type="text/javascript" src="/static/CLEditor1_2_2/jquery.cleditor.min.js"></script>
   
 <script type="text/javascript">
-
-	var GreenblogChallenge = "";
-
-	try {
 	
-		GreenblogChallenge = AuthenticationChallenge;
-		
-	}catch(error) {}
-
-	GREENBLOG.init(GreenblogChallenge);
-	GREENBLOG.seversalt = "${serversalt}";
+	GREENBLOG.init();
+	
+	{% if user %}
+		GREENBLOG.user = "{{ user.id }}";
+	{% endif %}
+	
+	{% block viewscript %}{% endblock %}
  
 </script>
 

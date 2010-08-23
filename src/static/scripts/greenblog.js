@@ -1,24 +1,37 @@
 /*
 * 
-* greenblog-band site client class
+* nifrost-band site client class
 *
 */
 var GREENBLOG = {
+		currentView: null,
+		currentNewsPageNumber : 0,
 		serversalt : '',
+		user: null,
 		challenge : '',
-		addUser:function() {
-			$.post('/new_user.html', function(data) {
-				  $('.result').html(data);
-			});
+		isLastNewsPage : false,
+		init:function() {
+			
+			this.loadWSYG();
+			this.initFunctionalStyles();
+			this.initLazyPostLoading();
+			
 		},
-		init:function(challenge) {
-			
-			this.challenge = challenge;
-			this.loadTinyMce();
-			this.initTopMenuAndFormStyle();
-			this.initDialogs();
-			this.initBindings();
-			
+		initLazyPostLoading:function() {
+			$(window).scroll(function(){
+			     if  (($(window).scrollTop() == $(document).height() - $(window).height())&&(!GREENBLOG.isLastNewsPage)&&(GREENBLOG.currentView == "newsView")) {
+			        GREENBLOG.ajaxLoadLastNewsPage();
+			     }
+			}); 
+		},
+		getNextNewsPageNumber:function() {
+			var result = this.currentNewsPageNumber+"";
+			this.currentNewsPageNumber++;
+			return result;
+		},
+		resetCurrentNewsPage:function() {
+			this.currentNewsPageNumber = 0;
+			this.isLastNewsPage = false;
 		},
 		insertHashedPassword:function(form_id_string,withChallenge) {
 			
@@ -39,66 +52,10 @@ var GREENBLOG = {
 			$('#' + form_id_string + ' > #password').val(passwordhash);
 			
 		},
-		deletePost:function(postid) {
-		
-			$.post("/delete_post.html", { id: postid },
-			   function(data){
-			   alert(data);
-			     /*$("html").replaceWith(data);*/
-			   });
-			
+		loadWSYG:function() {
+		    $("#elm1").cleditor();
 		},
-		deletePage:function(pageid) {
-		
-				$.post("/delete_page.html", { id: pageid },
-			   function(data){
-			     /*$("html").replaceWith(data);*/
-			   });
-			   
-		},
-		loadTinyMce:function() {
-		$('textarea.tinymce').tinymce({
-		
-			// Location of TinyMCE script
-			script_url : '/static/tinymce/jscripts/tiny_mce/tiny_mce.js',
-
-			// General options
-			theme : "advanced",
-			plugins : "pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,advlist",
-
-			// Theme options
-			theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,styleselect,formatselect,fontselect,fontsizeselect",
-			theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
-			theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
-			theme_advanced_buttons4 : "insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak",
-			theme_advanced_toolbar_location : "top",
-			theme_advanced_toolbar_align : "left",
-			theme_advanced_statusbar_location : "bottom",
-			theme_advanced_resizing : true,
-			theme_advanced_resize_horizontal : false,
-			
-			// Example content CSS (should be your site CSS)
-			//content_css : "css/content.css",
-
-			// Drop lists for link/image/media/template dialogs
-			template_external_list_url : "lists/template_list.js",
-			external_link_list_url : "lists/link_list.js",
-			external_image_list_url : "lists/image_list.js",
-			media_external_list_url : "lists/media_list.js",
-
-			// Replace values for the template plugin
-			template_replace_values : {
-				username : "Some User",
-				staffid : "991234"
-			}
-			
-		});
-		},
-		initTopMenuAndFormStyle:function() {
-		    
-		    $("ul.sf-menu").superfish({
-           	 pathClass:  'current'
-        	});
+		initFunctionalStyles:function() {
 
         	$("input").addClass("idle");
         	$("input").focus(function(){
@@ -106,91 +63,61 @@ var GREENBLOG = {
 	    	}).blur(function(){
 	       	     $(this).removeClass("activeField").addClass("idle");
 			});
+
+		},
+		ajaxLoadPage:function(key_name) {
+		
+			$("#main_content").empty();
+			$('div#ajaxLoader').show();
+			
+			jQuery.ajax({
+			    type: "GET",
+			    url: "/rest/page/"+key_name+"/",
+			    dataType: "json",
+			    success: function(data){
+			    	var admin_links = '';
+			    	if (GREENBLOG.user != null) admin_links = '<div class="admin_options"><a href="/edit/page/'+key_name+'/" id="p_'+key_name+'"><img title="edit page..."  alt="edit page..." src="/static/images/edit-32.png"/></a><a href="/delete/page/'+key_name+'/" class="delete_page_link" id="p_'+key_name+'"><img title="delete page..." src="/static/images/cross.png"/></a></div';
+			        var page = data[0].content + '<div class="date_field">'+ data[0].updated + '</div>';
+			        $('#main_content').html(admin_links+page);
+			    },
+			    error: function(XMLHttpRequest, textStatus, errorThrown){
+			        $('#main_content').html('<h2>404 page not found.</h2>');
+			    },
+			    complete: function() {
+			    	$('div#ajaxLoader').fadeOut();
+			    }
+			});
+			
+			GREENBLOG.currentView = "pageView";
 			
 		},
-		initDialogs:function() {
-		
-					// Dialogs			
-		$('#delete_page_dialog').dialog({
-			autoOpen: false,
-			width: 600,
-			buttons: {
-				"Yes": function() {
-					var page_id = $(this).find("#page_id").html();
-					GREENBLOG.deletePage(page_id);
-					$(this).dialog("close"); 
-				}, 
-				"No": function() { 
-					$(this).dialog("close"); 
-				} 
-			}
-		});
-		
-		$('#delete_post_dialog').dialog({
-			autoOpen: false,
-			width: 600,
-			buttons: {
-				"Yes": function() {
-					var post_id = $(this).find("#post_id").html();
-					GREENBLOG.deletePost(post_id);
-					$(this).dialog("close"); 
-				}, 
-				"No": function() { 
-					$(this).dialog("close"); 
-				} 
-			}
-		});
-		
-		$('#add_post_dialog').dialog({
-			autoOpen: false,
-			width: 720,
-			buttons: {
-				"Cancel": function() { 
-					$(this).dialog("close"); 
-				} 
-			}
-		});
-		
-		},
-		initBindings:function() {
-		
-					// delete page
-		$('.delete_page_link').click(function(){
-		
-			var idstring = $(this).attr("id");
-			var page_id = idstring.substring(2,idstring.length);
+		ajaxLoadLastNewsPage:function()	{
+		    
+		    $('div#ajaxLoader').show();
+		    
+		    var pageToLoad = GREENBLOG.getNextNewsPageNumber();
+		    
+		    jQuery.ajax({
+			    type: "GET",
+			    url: "/rest/news/"+pageToLoad+"/",
+			    dataType: "json",
+			    success: function(newspage){
+				    $.each(newspage, function(i,post){
+				    	var admin_links = "";
+				    	if (GREENBLOG.user != null) admin_links = '<div class="admin_options"><a href="/edit/post/'+post.id+'/" id="p_'+post.id+'"><img title="edit post..."  alt="edit post..." src="/static/images/edit-32.png"/></a><a href="/delete/post/'+post.id+'/" class="delete_post_link" id="p_'+post.id+'"><img title="delete post..." src="/static/images/cross.png"/></a></div';
+			            var post = '<h2>'+post.title + '</h2><div class="post_content">' + post.content + '</div><div class="date_field">' + post.created + '</div>';
+			            $('#main_content').append(admin_links+post);
+			        });
+			        $('div#ajaxLoader').fadeOut();
+			    },
+			    error: function(XMLHttpRequest, textStatus, errorThrown){
+			    	$('div#ajaxLoader').fadeOut();
+			    	GREENBLOG.isLastNewsPage = true;
+			    }
+			});
 			
-			$("#delete_page_dialog > #page_id").html(page_id);
-			$('#delete_page_dialog').dialog('open');
-			return true; // set to false when javascript feature is up
-			
-		});
-		
-		// delete post
-		$('.delete_post_link').click(function(){
-		
-			var idstring = $(this).attr("id");
-			var post_id = idstring.substring(2,idstring.length);
-			
-			$("#delete_post_dialog > #post_id").html(post_id);
-			$('#delete_post_dialog').dialog('open');
-			return true; // set to false when javascript feature is up
-			
-		});
-		
-		// add post
-		$('#add_post_link').click(function(){
-		
-			$('#add_post_dialog').dialog('open');
-			return false;
-			
-		});	
-		
-		},
-		initTransitions:function() {
-			
-			//$("#add_form").animate(...};
-		
+			GREENBLOG.currentView = "newsView";
+		    
 		}
 		
 };

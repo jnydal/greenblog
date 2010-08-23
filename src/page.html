@@ -3,9 +3,18 @@
 {% block title %}{{ page.title|escape }}{% endblock %}
 
 {% block content %}
+	
 		{% if user %}
 			<div class="admin_options"><a href="/edit/page/{{ page.key.name }}/" id="p_{{ page.key.name }}"><img title="edit page..."  alt="edit page..." src="/static/images/edit-32.png"/></a><a href="/delete/page/{{ page.key.name }}/" class="delete_page_link" id="p_{{ page.key.name }}"><img title="delete page..." src="/static/images/cross.png"/></a></div>
 		{% endif %}
+		
 	<div class="page_content">{{ page.content }}</div>
 	<div class="date_field">Updated {{ page.updated|date:"d.m.Y" }}</div>
+	
+{% endblock %}
+
+{% block viewscript %}
+
+	GREENBLOG.currentView = "pageView";
+
 {% endblock %}

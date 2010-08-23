@@ -7,11 +7,13 @@
 <form action="/edit/page/{{ page.key.name }}/" method="post">
 
 Title<br />
-<input type="text" name="title" value="{{ page.title }}"/><br />
+<input class="title" type="text" name="title" value="{{ page.title }}"/><br />
 Content<br />
 <textarea class="tinymce page" id="elm1" rows="15" cols="60" name="content">
 {{ page.content }}
 </textarea>
+
+<input value="Edit page" type="submit" class="button" />
 
 </form>
 

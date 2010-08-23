@@ -2,7 +2,7 @@ from models import PageModel
 
 def validateLoginModel(loginDataModel):
     
-    if ((loginDataModel.id == "greenblogadmin") & (loginDataModel.password == "builtInPw")):
+    if ((loginDataModel.id == "nifrostadmin") & (loginDataModel.password == "builtInPw")):
         return "true"
     else:
         return "false"

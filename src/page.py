@@ -25,6 +25,7 @@ from appengine_utilities import sessions
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from django.core.paginator import ObjectPaginator
+from django.utils import simplejson
 from models import PageModel
 from models import BlogPostModel
 from models import AdminModel
@@ -55,6 +56,12 @@ class PageViewHandler(webapp.RequestHandler):
             self.error(404)#('/'+key_name[:len(key_name)])
             path = os.path.join(os.path.dirname(__file__), '404.html')
             self.response.out.write(template.render(path, template_values))
+
+class PageJsonHandler(webapp.RequestHandler):
+    def get(self,key_name):
+        
+        page = PageModel.get_by_key_name(key_name, parent=None)
+        self.response.out.write(simplejson.dumps([page.to_dict()]))
 
 class PageNewHandler(webapp.RequestHandler):
     def post(self):
